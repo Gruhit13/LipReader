@@ -1,7 +1,7 @@
 import torch as T
 from torch import nn
 from torch.nn import functional as F
-from blocks import ResnetBlock, PointwiseConv1d, DepthwiseConv1d, ResidualConnectionBlock, Linear
+from blocks import ResnetBlock, PointwiseConv1d, DepthwiseConv1d, ResidualConnectionBlock, Linear, GlobalAvgPool2d
 from attention import MultiHeadSelfAttention
 from typing import List, Optional
 from transform import Transpose
@@ -20,7 +20,8 @@ class ResNetFrontEnd(nn.Module):
         self.block1 = self.__make_block(layers[0], 64, 64)
         self.block2 = self.__make_block(layers[1], 64, 128)
         self.block3 = self.__make_block(layers[2], 128, 256)
-        self.avgpool = nn.AvgPool2d(kernel_size=8, stride=1)
+        self.avgpool = GlobalAvgPool2d(dim=(2, 3))
+        self.linear = Linear(in_features=256, out_features=256)
 
     
     def __make_block(self, layers: int, in_feature: int, out_features: int) -> nn.Module:
@@ -39,10 +40,11 @@ class ResNetFrontEnd(nn.Module):
         x = self.block2(x)
         x = self.block3(x)
         x = self.avgpool(x)
+        x = self.linear(x)
 
         return x
 
-###################### FeedForward Netork ######################
+###################### FeedForward Network ######################
 # This is a feed forward network with pre-normalization as     #
 # shown in the paper. Also it uses swish activation function   #
 ################################################################

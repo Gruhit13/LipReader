@@ -1,6 +1,7 @@
 import torch as T
 from torch import nn
 from torch.nn import functional as F
+from typing import Tuple
 
 class ResnetBlock(nn.Module):
     def __init__(self, in_feature: int, out_feature: int, kernel_size: int, stride: int = 1, padding: int = 1):
@@ -48,6 +49,16 @@ class Linear(nn.Module):
         
     def forward(self, x: T.Tensor) -> T.Tensor:
         return self.linear(x)
+
+class GlobalAvgPool2d(nn.Module):
+    def __init__(self, dim=Tuple[int], keepdim: bool = False):
+        super(GlobalAvgPool2d, self).__init__()
+        self.dim = dim
+        self.keepdim = keepdim
+    
+    def forward(self, x: T.Tensor) -> T.Tensor:
+        x = x.mean(dim=self.dim, keepdim=self.keepdim)
+        return x
 
 class DepthwiseConv1d(nn.Module):
     def __init__(

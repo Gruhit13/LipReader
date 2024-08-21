@@ -47,8 +47,6 @@ class Conformer(nn.Module):
                         conv_dropout = conv_dropout
                     )
                 )
-            
-            
     
     def forward(self, x: T.Tensor, mask: Optional[T.Tensor] = None) -> T.Tensor:
         for block in self.blocks:

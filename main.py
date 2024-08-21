@@ -1,34 +1,26 @@
 import torch as T
-from networks import Conformer
+import torchvision as tv
+from torchvision.transforms import v2
+from model import VisualEfficientConformer
+from config import VECConfig
 from torchsummary import summary
 
-layers = [2, 2, 2]
-batch_size = 2
-frame_height = 64
-frame_width = 64
-channel_dim = 3
-timestamps = 32
-dim_model = [64, 128]
-num_blocks = [2, 2]
-num_heads = 4
+config = VECConfig
 
-conformer = Conformer(
-    dim_model= dim_model,
-    num_blocks=num_blocks,
-    max_seq_len=timestamps,
-    ff_expansion_factor=4,
-    ff_residual_factor=0.5,
-    num_heads=num_heads,
-    kernel_size=15,
-    conv_expansion_factor=2,
-    ff_dropout=0.1,
-    attn_dropout=0.1,
-    conv_dropout=0.1
-)
+model = VisualEfficientConformer(config)
+video_filepath = "./datasets/s1/bgah1s.mpg"
+video, _, _ = tv.io.read_video(video_filepath, pts_unit="sec", output_format="TCHW")
+video = video.to(T.float)
+video = v2.Grayscale()(video)
+video = v2.Resize(size=(224, 224))(video)
 
-inp_seq = T.randn(batch_size, timestamps, dim_model[0])
-print("Input Shape: ", inp_seq.shape)
-oup = conformer(inp_seq)
-print("Output Shape:", oup.shape)
+# [B, T, C, H, W] => [B, C, T, H, W]
+input_video = video.unsqueeze(0).transpose(1, 2)
 
-model_summary = summary(conformer, input_data=inp_seq, depth=4, verbose=0)
+# oup = model(input_video, lengths=10)
+# print("Output shape:", oup.shape)
+
+model_summary = summary(model, input_data=input_video, verbose=0)
+
+with open("model_summary2.txt", "w") as summary_writer:
+    summary_writer.write(model_summary.__str__())
