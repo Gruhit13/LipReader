@@ -48,8 +48,10 @@ class VisualEfficientConformer(nn.Module):
         
         # Conformer model to process the sequence data. 
         self.conformer = Conformer(
+            vocab_size = config.vocab_size,
             dim_model = config.dim_model,
             num_blocks = config.num_blocks,
+            interctc_block = config.interctc_block,
             max_seq_len = config.max_seq_len,
             ff_expansion_factor = config.ff_expansion_factor,
             ff_residual_factor = config.ff_residual_factor,
@@ -92,9 +94,9 @@ class VisualEfficientConformer(nn.Module):
         x = x.squeeze(-1).squeeze(-1).transpose(1, 2)
 
         # [B, T', 256] => [B, T'', 360]
-        x = self.conformer(x, mask)
+        x, interctc_output = self.conformer(x, mask)
 
         # [B, T'', 360] => [B, T'', 360]
         x = self.head(x)
 
-        return x
+        return x, interctc_output

@@ -2,9 +2,9 @@ import torch as T
 from torch import nn
 from torch.nn import functional as F
 from typing import Optional
-import math
 from embeddings import RelativeSinusoidalPositionEncoding
 from blocks import Linear
+import math
 
 class RelativeMultiheadAttention(nn.Module):
     def __init__(

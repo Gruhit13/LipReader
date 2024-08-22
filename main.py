@@ -22,5 +22,5 @@ input_video = video.unsqueeze(0).transpose(1, 2)
 
 model_summary = summary(model, input_data=input_video, verbose=0)
 
-with open("model_summary2.txt", "w") as summary_writer:
+with open("model_summary.txt", "w") as summary_writer:
     summary_writer.write(model_summary.__str__())

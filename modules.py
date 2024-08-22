@@ -130,6 +130,7 @@ class ConformerBlock(nn.Module):
         super(ConformerBlock, self).__init__()
 
         self.ff_residual_factor = ff_residual_factor
+        self.stride = stride # Will be used to updated the length of tokens
         
         # First Half residual FeedForward Block
         self.ff_net_1 = ResidualConnectionBlock(

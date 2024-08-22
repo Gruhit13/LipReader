@@ -123,3 +123,19 @@ class ResidualConnectionBlock(nn.Module):
     
     def forward(self, *x:T.Tensor) -> T.Tensor:
         return (self.module(*x) * self.module_factor) + (x[0] * self.input_factor)
+
+class InterCTCBlock(nn.Module):
+    def __init__(
+        self,
+        dim_model: int,
+        vocab_size: int,
+    ):
+        super(InterCTCBlock, self).__init__()
+
+        self.proj1 = Linear(dim_model, vocab_size)
+        self.proj2 = Linear(vocab_size, dim_model)
+    
+    def forward(self, x: T.Tensor) -> Tuple[T.Tensor]:
+        logits = self.proj1(x)
+        x = x + self.proj2(logits)
+        return x, logits

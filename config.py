@@ -8,7 +8,8 @@ class VECConfig:
     video_processing_stride: Tuple[int] = (1, 2, 2)
     resnet_layers: List[int] = [2, 2, 2]
     dim_model: List[int] = [256, 360]
-    num_blocks: List[int] = [6, 6]
+    num_blocks: List[int] = [6, 1]
+    interctc_block: List[int] = [3, 6]
     max_seq_len: int = 10000
     ff_expansion_factor: int = 4
     ff_residual_factor: float = 0.5
